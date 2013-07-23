@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>Editor</title>
+		<link rel="stylesheet" href="style.css">
+	</head>
+	<body>
+		<div id="title">GooseDitor v0.0.1 alphamale</div>
+		<div id="content">
+			<div id="lineNumbers">1</div>
+			<textarea id="editor" class="boxsizingBorder"></textarea>
+			<div style="clear: both"></div>
+		</div>
+		<div id="settings">
+			Font size:
+			<select id="fontSize">
+				<option value="16px">Default</option>
+				<option value="12px">Small</option>
+				<option value="20px">Big</option>
+			</select>
+			Font family:
+			<select id="fontFamily">
+				<option value="Consolas">Consolas</option>
+				<option value="Courier new">Courier new</option>
+				<option value="Wingdings">Wingdings</option>
+			</select>
+		</div>
+
+		<script type="text/javascript" src="jquery-2.0.3.min.js"></script>
+		<script type="text/javascript" src="jquery-textrange.js"></script>
+		<script type="text/javascript" src="gooseditor.js"></script>
+	</body>
+</html>

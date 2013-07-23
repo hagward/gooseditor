@@ -1,13 +1,13 @@
-var editorDefaultHeight = parseInt($('#editor').css('height').slice(0, -2));
-var editorHeightIncrease = parseInt($('#editor').css('font-size').slice(0, -2)) + 3;
-
+// Here follows some configurable variables.
 var numLines = 1;
 var numSpacesIndent = 4;
 var documentLength = 0;
-
 var autoCompleteLiterals = {'(': ')', '[': ']', '{': '}'};
+var ignoreLiterals = {')': '(', ']': '[', '}': '{', ':': ':', ';': ';'};
 var indentLiterals = {'{': '}'};
 
+var editorDefaultHeight = parseInt($('#editor').css('height').slice(0, -2));
+var editorHeightIncrease = parseInt($('#editor').css('font-size').slice(0, -2)) + 3;
 var indentText = [];
 for (var i = 0; i < numSpacesIndent; i++)
 	indentText.push(' ');
@@ -15,18 +15,53 @@ indentText = indentText.join('');
 
 $(document).ready(function() {
 	$('#editor').keydown(function(event) {
-		// Indent when user presses tab.
-		if (event.which == 9) {
+		var keyCode = event.keyCode || event.which;
+		var cursorPos = $('#editor').textrange('get')['position'];
+		// User presses tab.
+		if (keyCode == 9) {
+			// Try to indent.
 			event.preventDefault();
-			editorInsert(indentText, $('#editor').textrange('get')['position'], true);
+			editorInsert(indentText, cursorPos, true);
 		}
 	});
 
-	$('#editor').bind('updateInfo keyup mousedown mousemove mouseup', function() {
+	$('#editor').keypress(function(event) {
+		var keyCode = event.keyCode || event.which;
+		var cursorPos = $('#editor').textrange('get')['position'];
+		// User inserts a newline.
+		if (keyCode == 13) {
+			event.preventDefault();
+			var indentLevel = autoIndent(cursorPos);
+			editorInsert('\n', cursorPos, false);
+			$('#editor').textrange('setcursor',
+				cursorPos + numSpacesIndent * indentLevel + 1);
+		// User inserts a letter or special character.
+		} else if (keyCode > 31 && keyCode < 128) {
+			var insertedChar = String.fromCharCode(keyCode);
+			if (ignoreLiterals[insertedChar] && $('#editor').val().charAt(cursorPos) == insertedChar) {
+				event.preventDefault();
+				$('#editor').textrange('setcursor', cursorPos + 1);
+			} else {
+				autoComplete(cursorPos, insertedChar);
+			}
+		}
 		updateLineNumberBar();
-		if (getLengthDiff() == 1)
-			autoComplete();
-		documentLength = $('#editor').val().length;
+	});
+
+	$('#editor').bind('input propertychange', function() {
+		updateLineNumberBar();
+	});
+
+	$('#fontSize').change(function() {
+		var fontSize = $('#fontSize').val();
+		$('#lineNumbers').css('font-size', fontSize);
+		$('#editor').css('font-size', fontSize);
+	});
+
+	$('#fontFamily').change(function() {
+		var fontFamily = $('#fontFamily').val();
+		$('#lineNumbers').css('font-family', fontFamily);
+		$('#editor').css('font-family', fontFamily);
 	});
 });
 
@@ -55,12 +90,9 @@ function updateLineNumberBar() {
 	numLines = newNumLines;
 }
 
-function autoIndent() {
-	console.log('autoIndent');
+function autoIndent(position) {
 	var indentArray = [];
-	var position = $('#editor').textrange('get')['position'];
 	var indentLevel = getIndentLevel(position);
-	console.log('level: ' + indentLevel);
 	
 	if (indentLevel > 0) {
 		for (var i = 0; i < indentLevel; i++)
@@ -75,22 +107,17 @@ function autoIndent() {
 		editorInsert(indentArray.join(''), position, false);
 		$('#editor').textrange('setcursor', position + indentLevel * numSpacesIndent);
 	}
+	return indentLevel;
 }
 
-function autoComplete() {
-	var text = $('#editor').val();
-	var cursorPos = $('#editor').textrange('get')['position'];
-	var insertedChar = text.charAt(cursorPos - 1);
-	if (insertedChar == '\n') {
-		autoIndent();
-	} else {
-		var replacement = autoCompleteLiterals[insertedChar];
-		if (replacement) {
-			console.log('autoComplete');
-			editorInsert(replacement, cursorPos, false);
-			$('#editor').textrange('setcursor', cursorPos);
-		}
+function autoComplete(position, insertedChar) {
+	var replacement = autoCompleteLiterals[insertedChar];
+	if (replacement) {
+		editorInsert(replacement, position, false);
+		$('#editor').textrange('setcursor', position);
+		return true;
 	}
+	return false;
 }
 
 function getLengthDiff() {

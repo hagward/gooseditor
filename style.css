@@ -1,0 +1,55 @@
+body {
+	font-family: "Cambria", sans-serif;
+}
+
+#title {
+	text-align: center;
+	margin-top: 20px;
+	font-size: 20px;
+}
+
+#content {
+	width: 800px;
+	height: 500px;
+	margin: 20px auto 10px;
+	overflow: auto;
+	border: 3px solid #CCC;
+}
+
+#lineNumbers {
+	width: 4%;
+	height: 496px;
+	float: left;
+	text-align: center;
+	background-color: #54FFAF;
+	font: 16px "Consolas";
+	padding: 2px;
+}
+
+#editor {
+	margin: 0;
+	display: block;
+	width: 94%;
+	height: 499px;
+	float: left;
+	font: 16px "Consolas";
+	padding: 2px;
+	overflow: hidden;
+	border: none;
+	outline: none;
+	resize: none;
+}
+
+#settings {
+	text-align: center;
+}
+
+#fontSize {
+	margin-right: 16px;
+}
+
+.boxsizingBorder {
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
