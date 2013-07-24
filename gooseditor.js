@@ -25,8 +25,11 @@ $(document).ready(function() {
 	$('#editor').keydown(function(event) {
 		var keyCode = event.keyCode || event.which;
 		var cursorPos = $('#editor').textrange('get')['position'];
+		// User presses backspace.
+		if (keyCode == 8) {
+			autoRemove();
 		// User presses tab.
-		if (keyCode == 9) {
+		} else if (keyCode == 9) {
 			// Try to indent.
 			event.preventDefault();
 			editorInsert(indentText, cursorPos, true);
@@ -35,18 +38,17 @@ $(document).ready(function() {
 
 	// Handle all regular keypresses.
 	$('#editor').keypress(function(event) {
-		var keyCode = event.keyCode || event.which;
 		var cursorPos = $('#editor').textrange('get')['position'];
 		// User inserts a newline.
-		if (keyCode == 13) {
+		if (event.which == 13) {
 			event.preventDefault();
 			var indentLevel = autoIndent(cursorPos);
 			editorInsert('\n', cursorPos, false);
 			$('#editor').textrange('setcursor',
 				cursorPos + numSpacesIndent * indentLevel + 1);
 		// User inserts a letter or special character.
-		} else if (keyCode > 31 && keyCode < 128) {
-			var insertedChar = String.fromCharCode(keyCode);
+		} else if (event.which > 31 && event.which < 128) {
+			var insertedChar = String.fromCharCode(event.which);
 			if (ignoreLiterals[insertedChar] && $('#editor').val().charAt(cursorPos) == insertedChar) {
 				event.preventDefault();
 				$('#editor').textrange('setcursor', cursorPos + 1);
@@ -194,6 +196,26 @@ function autoComplete(position, insertedChar) {
 	}
 	return false;
 }
+
+/**
+ * Does the opposite of autoComplete(); it tries to remove related characters.
+ */
+ function autoRemove() {
+ 	var doc = $('#editor').val();
+ 	var position = $('#editor').textrange('get', 'position');
+ 	var removedChar = doc.charAt(position - 1);
+ 	console.log('removedChar: ' + removedChar);
+ 	var remove = autoCompleteLiterals[removedChar];
+ 	if (remove) {
+ 		console.log('autoRemove!');
+ 		var docPieces = [
+ 			doc.substring(0, position),
+ 			doc.substring(position + 1, doc.length)
+ 		];
+ 		$('#editor').val(docPieces.join(''));
+ 		$('#editor').textrange('setcursor', position);
+ 	}
+ }
 
 /**
  * Inserts 'text' at 'position' in the editor. If 'setCursor' is set, the
