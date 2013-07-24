@@ -10,27 +10,28 @@ body {
 
 #content {
 	width: 800px;
-	height: 500px;
+	height: 501px;
 	margin: 20px auto 10px;
 	overflow: auto;
 	border: 3px solid #CCC;
 }
 
 #lineNumbers {
-	width: 4%;
-	height: 496px;
+	width: auto;
+	height: 497px;
 	float: left;
 	text-align: center;
 	background-color: #54FFAF;
 	font: 16px "Consolas";
-	padding: 2px;
+	padding: 2px 8px;
+	line-height: 1em;
 }
 
 #editor {
 	margin: 0;
 	display: block;
 	width: 94%;
-	height: 499px;
+	height: 497px;
 	float: left;
 	font: 16px "Consolas";
 	padding: 2px;
@@ -38,13 +39,15 @@ body {
 	border: none;
 	outline: none;
 	resize: none;
+	line-height: 1em;
 }
 
 #settings {
 	text-align: center;
+	/*border: 1px solid black;*/
 }
 
-#fontSize {
+#fontSize, #useLineNumbers {
 	margin-right: 16px;
 }
 
